@@ -1,3 +1,6 @@
+require('commonService');
+require('commonDirective');
+
 var component2 = angular.module('component2', ['commonService', 'commonDirective'])
 
 component2.directive('component2', function($rootScope, commonService){

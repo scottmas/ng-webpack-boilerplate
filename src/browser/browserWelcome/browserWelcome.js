@@ -1,6 +1,13 @@
-var browserWelcome = angular.module('browserWelcome', ['ngRoute', 'component2', 'component1', 'commonService']);
+//Modules
+require('script!angular-route');
+require('component2');
+require('component1');
+require('commonService');
 
+//SCSS
 require('./browserWelcome.scss');
+
+var browserWelcome = angular.module('browserWelcome', ['ngRoute', 'component2', 'component1', 'commonService']);
 
 browserWelcome.config(function($routeProvider){
     $routeProvider

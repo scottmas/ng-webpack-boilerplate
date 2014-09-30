@@ -1,6 +1,20 @@
-var $ = require('jquery');
+//Load globals
+require('script!jquery');
+require('script!angular');
 
-var browser = angular.module('browser', ['ngRoute', 'browserWelcome', 'browserAbout']);
+//Load app scripts
+require('script!angular-moment');
+require('script!angular-route');
+
+//Load pages
+require('./browserWelcome/browserWelcome.js');
+require('./browserAbout/browserAbout.js');
+
+var browser = angular.module('browser', [
+        'ngRoute',
+        'browserWelcome',
+        'browserAbout'
+]);
 
 browser.config(function($routeProvider){
     $routeProvider

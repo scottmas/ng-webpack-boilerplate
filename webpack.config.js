@@ -1,7 +1,8 @@
-var angularPlugin = require('angular-webpack-plugin');
-var SplitByNamePlugin = require('split-by-name-webpack-plugin');
+
+//var SplitByNamePlugin = require('split-by-name-webpack-plugin');
 var webpack = require('webpack');
 var path = require('path');
+var Airclass = require('./config/airclassPlugin.js');
 
 module.exports = {
     entry: {
@@ -11,12 +12,8 @@ module.exports = {
     output: {
         filename: "/[name].bundle.js",
         chunkFilename: "[name].bundle.js"
-
     },
     resolve: {
-        alias: {
-            ngRoute$: 'angular-route'
-        },
         root: [
             process.cwd(),
             path.resolve('src', 'common', 'components'),
@@ -36,10 +33,10 @@ module.exports = {
         ]
     },
     plugins: [
-        new angularPlugin(),
         new webpack.ResolverPlugin(
             new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin("bower.json", ["main"])
         ),
+        new Airclass()
 /*        new SplitByNamePlugin({
             buckets: [{
                 name: 'angular',
@@ -49,7 +46,7 @@ module.exports = {
                 regex: /(?:jquery$)/
             }]
         }),*/
-        new webpack.optimize.CommonsChunkPlugin('common.bundle.js')
+        //new webpack.optimize.CommonsChunkPlugin('common.bundle.js')
     ]
 
 };

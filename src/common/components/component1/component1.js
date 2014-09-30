@@ -1,3 +1,5 @@
+require('commonDirective');
+
 require('./component1.scss');
 var component1 = angular.module('component1', ['commonDirective']);
 

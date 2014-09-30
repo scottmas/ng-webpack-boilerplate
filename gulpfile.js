@@ -13,50 +13,21 @@ var inject = require('gulp-inject');
 var webpackError = false;
 
 //Tasks
-gulp.task('dev', ['dev-onetime'], function(cb){
-    gulp.run(['dev:webpack', 'dev:mocha', 'dev:servers', 'dev:misc'], cb)
-});
+gulp.task('dev', ['dev:webpack', 'dev:servers', 'dev:misc']);
 
-//I hate dev-onetime but gulp runs tasks concurrently, so the first time the dev
-//command is run, the mocha task fails because the webpack bundle hasn't been built yet.
-//Todo: Is there a better way?
-gulp.task('dev-onetime', ['dev-onetime:webpack']);
+gulp.task('build', ['build:webpack']);
 
-gulp.task('dev-onetime:webpack', function(cb){
-    extend(true, webpackOpts, {
-        output: {path: './build/dev', pathinfo: true},
-        devtool: '#eval',
-        debug: true
-    });
-
-    doWebpack('dev', webpackOpts, cb)
-});
-
-gulp.task('build', function(cb){
-    gulp.run('build:webpack', function(){
-        gulp.run('build:mocha', cb);
-    })
-});
 gulp.task('default', ['dev']);
 
-gulp.task('dev:mocha', function(cb){
-    doMocha(['-w', '-R', 'min'], cb)
-});
-
-gulp.task("dev:misc", []);
-
-gulp.task('build:mocha', function(cb){
-    doMocha([], cb)
-});
-
 gulp.task('build:misc', []);
+gulp.task('dev:misc', []);
 
 gulp.task('dev:webpack', function(cb){
     extend(true, webpackOpts, {
         output: {path: './build/dev', pathinfo: true},
         watch: true,
         watchDelay: 200,
-        devtool: '#eval',
+        //devtool: '#eval',
         debug: true
     });
 
@@ -91,24 +62,6 @@ gulp.task('dev:servers', function(){
 });
 
 //Helper functions (the meat of the tasks)
-function doMocha(extraArgs, cb){
-    //Note: The mocha node API sucks, so we just spawn a process via commandn line.
-    var args = ['node', 'node_modules/mocha/bin/mocha', 'test/testEntry.js'];
-
-    var mochaProc = exec(args.concat(extraArgs || []), cb);
-
-    mochaProc.stdout.on('data', function(data){
-        if(webpackError) return;
-        process.stdout.write(clc.red(String(data)));
-
-    });
-
-    mochaProc.stderr.on('data', function(data){
-        if(webpackError) return;
-        process.stdout.write(clc.red(String(data)))
-    });
-}
-
 function doWebpack(mode, opts, cb){
     var softErr;
 
@@ -138,14 +91,16 @@ function doWebpack(mode, opts, cb){
         chunks.forEach(function(chunk){
             var file = chunk.files[0];
             if(file.charAt(0) === '/') file = file.slice(1);
-            if(chunk.initial && chunk.entry){
-                scripts.unshift("./build/dev/" + file); //Todo: Is it always files[0]? Thus far yes, but it may not always
-            } else if(chunk.names[0] === 'native' || chunk.names[0] === 'browser'){
+
+            if(chunk.names[0] == 'native' || chunk.names[0] == 'browser'){
                 //do nothing
+            } else if(chunk.initial && chunk.entry){
+                scripts.unshift("./build/dev/" + file); //Todo: Is it always files[0]? Thus far yes, but it may not always
             }
             else{
                 scripts.push("./build/dev/" + file)
             }
+
         });
 
         gulp.src('./src/browser/browser.html')
